@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,9 +22,18 @@ public class MainActivity extends AppCompatActivity {
         public int intents;
         public String nom;
 
-        public Record(int _intents, String _nom) {
+        public int imageResource;
+
+
+        public Record(int _intents, String _nom, int _imageResource) {
             intents = _intents;
             nom = _nom;
+            imageResource = _imageResource;
+
+        }
+
+        public int getImageResource(){
+            return imageResource;
         }
 
         public String getNom() {
@@ -39,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Record> records;
     static ArrayList<String> noms;
 
+    static ArrayList<String> fotos;
+
     // ArrayAdapter serà l'intermediari amb la ListView
     ArrayAdapter<Record> adapter;
 
@@ -46,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        noms = new ArrayList<String>();
-         noms = new ArrayList<>(Arrays.asList(
+        String[] fotos = {"baixa","baixa1","baixa2","baixa4"};
+        noms = new ArrayList<>(Arrays.asList(
                  "Manuel", "Raquel", "Antonio", "Elena", "David",
                  "Silvia", "Joaquín", "Marta", "Javier", "Cristina",
                  "Francisco", "Patricia", "Alejandro", "Natalia", "Roberto",
@@ -57,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         // Inicialitzem model
         records = new ArrayList<Record>();
         // Afegim alguns exemples
-        records.add(new Record(33, "Manolo"));
-        records.add(new Record(12, "Pepe"));
-        records.add(new Record(42, "Laura"));
+        records.add(new Record(33, "Manolo",getResources().getIdentifier("baixa", "drawable", getPackageName())));
+        records.add(new Record(12, "Pepe",getResources().getIdentifier("baixa1", "drawable", getPackageName())));
+        records.add(new Record(42, "Laura",getResources().getIdentifier("baixa4", "drawable", getPackageName())));
 
         // Inicialitzem l'ArrayAdapter amb el layout pertinent
         adapter = new ArrayAdapter<Record>(this, R.layout.list_item, records) {
@@ -73,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 // "Pintem" valors (també quan es refresca)
                 ((TextView) convertView.findViewById(R.id.nom)).setText(getItem(pos).nom);
                 ((TextView) convertView.findViewById(R.id.intents)).setText(Integer.toString(getItem(pos).intents));
+                ImageView imageView = convertView.findViewById(R.id.imageView);
+                imageView.setImageResource(getItem(pos).imageResource);
                 return convertView;
             }
 
@@ -90,9 +104,10 @@ public class MainActivity extends AppCompatActivity {
                 Random rand = new Random();
                 int indiceAleatorio = rand.nextInt(noms.size());
                 int numeroAleatorio = rand.nextInt(100) + 1;
-                for (int i = 0; i < 1; i++) {
-                    records.add(new Record(numeroAleatorio, noms.get(indiceAleatorio)));
-                }
+                int posicion = rand.nextInt(fotos.length);
+                String imagen = fotos[posicion];
+                int imageResource = getResources().getIdentifier(imagen, "drawable", getPackageName());
+                    records.add(new Record(numeroAleatorio, noms.get(indiceAleatorio),imageResource));
                 // notificar l'adapter dels canvis al model
                 adapter.notifyDataSetChanged();
             }
@@ -105,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(records, new Comparator<Record>() {
                     @Override
                     public int compare(Record record1, Record record2) {
-                        return Integer.compare(record1.getIntents(), record2.getIntents());
+                        return Integer.compare(record2.getIntents(), record1.getIntents());
                     }
                 });
                 // notificar l'adapter dels canvis al model
